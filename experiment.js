@@ -368,7 +368,7 @@ var sample_n_iat = function(list, n) {
 // Switching to fullscreen --------------------------------------------------------------
 var fullscreen_trial = {
   type: 'fullscreen',
-  message:  'To start Task 2, please switch again to full screen',
+  message:  'To start Task 2, please switch again to full screen </br></br>',
   button_label: 'Switch to fullscreen',
   fullscreen_mode: true
 }
