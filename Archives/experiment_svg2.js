@@ -72,7 +72,7 @@ var iat_black_1 = jsPsych.randomization.sampleWithoutReplacement(["left", "right
 // We create a TaskOrder variable
 var TaskOrder   = jsPsych.randomization.sampleWithoutReplacement(["IAT_first", "VAAST_first"], 1)[0];
 
-var jspsych_id  = jsPsych.data.getURLVariable("id");
+var jspsych_id  = jsPsych.randomization.randomID();
 
  // cursor helper functions
 var hide_cursor = function() {
@@ -1698,7 +1698,7 @@ if(is_compatible) {
         jsPsych.data.addProperties({
           taskOrder: TaskOrder,
         });
-        window.location.href = "https://uclpsychology.co1.qualtrics.com/jfe/form/SV_0NRoqjK0V6IpikJ?id=" + jspsych_id;
+        window.location.href = "https://uclpsychology.co1.qualtrics.com/jfe/form/SV_0NRoqjK0V6IpikJ?id="+jspsych_id;
     }
   });
 }
