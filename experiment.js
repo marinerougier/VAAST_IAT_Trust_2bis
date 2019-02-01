@@ -368,21 +368,10 @@ var sample_n_iat = function(list, n) {
 // Switching to fullscreen --------------------------------------------------------------
 var fullscreen_trial = {
   type: 'fullscreen',
-  message:  '',
+  message:  'To start Task 2, please switch again to full screen',
   button_label: 'Switch to fullscreen',
   fullscreen_mode: true
 }
-
-
-// Initial instructions -----------------------------------------------------------------
-// First slide --------------------------------------------------------------------------
-var instructions = {
-  type: "html-keyboard-response",
-  stimulus:
-    "<p>You are now about to start Task 2.</p>" +
-    "<p class = 'continue-instructions'>Press <strong>space</strong> to start Task 2.</p>",
-  choices: [32]
-};
 
 
 // VAAST --------------------------------------------------------------------------------
@@ -1596,9 +1585,6 @@ timeline.push(fullscreen_trial,
 
 // prolific verification
 timeline.push(save_id);
-
-// initial instructions
-timeline.push(instructions);
 
 
 switch(TaskOrder) {
