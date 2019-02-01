@@ -364,11 +364,90 @@ var sample_n_iat = function(list, n) {
 }
 
 // EXPERIMENT ---------------------------------------------------------------------------
+// initial instructions -----------------------------------------------------------------
+var welcome = {
+  type: "html-keyboard-response",
+  stimulus:
+    "<h1 class ='custom-title'> Welcome </h1>" +
+    "<p class='instructions'> First, thank you for taking part to this study.<p>" +
+    "<p class='instructions'> During this study, you will have to complete two different tasks. We " +
+    "will gather data related to how you complete them, but " + 
+    "no personally identifying information will be collected. </p>" +
+    "<p class='instructions'> Because we rely on third party services to gather data, ad-blocking" +
+    " software might interfere with data collection. Therefore, please" +
+    " disable your ad-blocking software during this study." +
+    "<b> If we cannot collect your data, we will not be able to reward you for " +
+    "your participation</b>. </p>" +
+    "<p class='instructions'> If you have any question related to this research, please " +
+    "e-mail marine.rougier@uclouvain.be</p>" +
+    "<p class = 'continue-instructions'>Press <strong>espace</strong> to start the study.</p>",
+  choices: [32]
+};
+
+var welcome_2 = {
+  type: "html-button-response",
+  stimulus:
+    "<p class='instructions'>Before going further, please note that this study should take" +
+    " XXX minutes to complete.</p>",
+  choices: ['I have enough time', 'I do not have enough time'],
+};
+
+var not_enough_time_to_complete = {
+    type: 'html-button-response',
+    stimulus: '<p>Please come back later to take part in this experiment.</p>',
+    choices: ['Go back to Prolific Academic'],
+};
+
+var redirect_to_prolific = {
+    type: 'call-function',
+    func: function() {
+        window.location.href = "https://www.prolific.ac/";
+        jsPsych.pauseExperiment();
+    }
+}
+
+var if_not_enough_time = {
+    timeline: [not_enough_time_to_complete, redirect_to_prolific],
+    conditional_function: function(){
+        // get the data from the previous trial,
+        // and check which key was pressed
+        var data = jsPsych.data.getLastTrialData().values()[0].button_pressed;
+        if(data == 1){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+var welcome_3 = {
+  type: "html-keyboard-response",
+  stimulus:
+    "<p class='instructions'>We will now proceed to a test of your connection to our server. " +
+    "If this test fails, please check your Internet connection and make sure you have " +
+    "actually disabled your ad-blocking software.</p>" +
+    "<p class='instructions'>This test should last less than 5 seconds.</p>" +
+    "<p class ='continue-instructions'>Press <strong>space</strong> to continue.</p>",
+  choices: [32]
+};
+
+// ping keen.io -------------------------------------------------------------------------
+
+var keen_ping = {
+    type: 'keen-ping',
+    loader_image: 'media/loading.gif',
+    stream_name: 'stream_ping',
+    write_key: stream_writeKey,
+    project_id: stream_projectID,
+    session_id: jspsych_id,
+    choices: [32]
+  }
+
 
 // Switching to fullscreen --------------------------------------------------------------
 var fullscreen_trial = {
   type: 'fullscreen',
-  message:  '',
+  message:  '<p>To take part in this study, your browser needs to be set to fullscreen.</p>',
   button_label: 'Switch to fullscreen',
   fullscreen_mode: true
 }
@@ -379,8 +458,8 @@ var fullscreen_trial = {
 var instructions = {
   type: "html-keyboard-response",
   stimulus:
-    "<p>You are now about to start Task 2.</p>" +
-    "<p class = 'continue-instructions'>Press <strong>space</strong> to start Task 2.</p>",
+    "<p>You are now about to start the study. In this study, you will engage in three different tasks.</p>" +
+    "<p class = 'continue-instructions'>Press <strong>space</strong> to start Task 1.</p>",
   choices: [32]
 };
 
@@ -1576,6 +1655,61 @@ var iat_instructions_2 = {
   choices: [32]
 };
 
+//
+var Quest_instructions = {
+  type: "html-keyboard-response",
+  stimulus:
+    "<h1 class ='custom-title'> Questionnaires </h1>" +
+    "<p><center>Now that you completed the two categorization tasks, you have to fill a short survey.</center></p>" +
+    "<p class = 'continue-instructions'>Press <strong>space</strong> to continue.</p>",
+  choices: [32]
+};
+
+
+var scale_termo = ["1</br>coldest feelings", "2", "3", "4", "5</br>neutral", "6", "7", "8", "9</br>warmest feelings"];
+var scale_EMS = ["1</br>strongly disagree", "2", "3", "4", "5</br>neutral", "6", "7", "8", "9</br>strongly agree"];
+
+var termo = {
+    type: 'survey-likert',
+    questions: [{prompt: "Please rate how warm or cold you feel toward Black people",labels: scale_termo, required: true},
+                {prompt: "Please rate how warm or cold you feel toward White people",labels: scale_termo, required: true}
+             ],
+            on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+};
+
+
+var EMS = {
+    type: 'survey-likert',
+    questions: [
+        {prompt: "Because today's PC (politically correct) standards I try to appear nonprejudiced toward Black people", labels: scale_EMS, required: true},
+        {prompt: "I try to hide any negative thoughts about Black people in ordeer to avoid negative reactions from others", labels: scale_EMS, required: true},
+        {prompt: "If I acted prejudiced toward Black people, I would be concerned that others would be angry with me", labels: scale_EMS, required: true},
+        {prompt: "I attempt to appear nonprejudiced toward Black people in order to avoid disapproval from others", labels: scale_EMS, required: true},
+        {prompt: "I try to act nonprejudiced toward Black people because of pressure from others", labels: scale_EMS, required: true}
+        ],
+            //randomize_order: true,
+            on_load: function() {
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        //   $("li:first-of-type").css("width", "110px");
+        //   $("li:last-of-type").css("width", "110px");
+        },
+};
 
 // end fullscreen -----------------------------------------------------------------------
 
@@ -1590,6 +1724,15 @@ var fullscreen_trial_exit = {
 
 var timeline = [];
 
+// welcome
+timeline.push(welcome,
+              welcome_2,
+              if_not_enough_time,
+              welcome_3);
+
+// keen.io connexion test
+timeline.push(keen_ping);
+
 // fullscreen
 timeline.push(fullscreen_trial,
 			  hiding_cursor);
@@ -1601,74 +1744,79 @@ timeline.push(save_id);
 timeline.push(instructions);
 
 
-switch(TaskOrder) {
-  case "IAT_first":
-    timeline.push(iat_instructions_1,
-                  iat_instructions_1_1,
-                  iat_instructions_block_1, 
-                  iat_block_1,
-                  iat_instructions_block_2, 
-                  iat_block_2,
-                  iat_instructions_block_3, 
-                  iat_block_3_training,
-                  iat_instructions_block_3_test, 
-                  iat_block_3_test,
-                  iat_instructions_block_4, 
-                  iat_block_4,
-                  iat_instructions_block_5, 
-                  iat_block_5_training,
-                  iat_instructions_block_5_test, 
-                  iat_block_5_test,
-                  iat_instructions_2, 
-                  vaast_instructions_1,
-                  vaast_instructions_2,
-                  vaast_instructions_2_1,
-                  vaast_instructions_3, 
-                  vaast_instructions_4,
-                  vaast_training_block_1,
-                  vaast_instructions_5,
-                  vaast_test_block_1,
-                  vaast_instructions_6,
-                  vaast_training_block_2,
-                  vaast_instructions_7,
-                  vaast_test_block_2,
-                  vaast_instructions_8);
-    break;
-  case "VAAST_first":
-    timeline.push(vaast_instructions_1,
-                  vaast_instructions_2,
-                  vaast_instructions_2_1,
-                  vaast_instructions_3, 
-                  vaast_instructions_4,
-                  vaast_training_block_1,
-                  vaast_instructions_5,
-                  vaast_test_block_1,
-                  vaast_instructions_6,
-                  vaast_training_block_2,
-                  vaast_instructions_7,
-                  vaast_test_block_2,
-                  vaast_instructions_8,
-                  iat_instructions_1,
-                  iat_instructions_1_1,
-                  iat_instructions_block_1, 
-                  iat_block_1,
-                  iat_instructions_block_2, 
-                  iat_block_2,
-                  iat_instructions_block_3, 
-                  iat_block_3_training,
-                  iat_instructions_block_3_test, 
-                  iat_block_3_test,
-                  iat_instructions_block_4, 
-                  iat_block_4,
-                  iat_instructions_block_5, 
-                  iat_block_5_training,
-                  iat_instructions_block_5_test, 
-                  iat_block_5_test,
-                  iat_instructions_2);
-    break;
-}
+//switch(TaskOrder) {
+  //case "IAT_first":
+    //timeline.push(iat_instructions_1,
+      //            iat_instructions_1_1,
+      //            iat_instructions_block_1, 
+      //            iat_block_1,
+      //            iat_instructions_block_2, 
+      //            iat_block_2,
+      //            iat_instructions_block_3, 
+      //            iat_block_3_training,
+      //            iat_instructions_block_3_test, 
+      //            iat_block_3_test,
+      //            iat_instructions_block_4, 
+      //            iat_block_4,
+      //            iat_instructions_block_5, 
+      //            iat_block_5_training,
+      //            iat_instructions_block_5_test, 
+      //            iat_block_5_test,
+      //            iat_instructions_2, 
+      //            vaast_instructions_1,
+      //            vaast_instructions_2,
+      //            vaast_instructions_2_1,
+      //            vaast_instructions_3, 
+      //            vaast_instructions_4,
+      //            vaast_training_block_1,
+      //            vaast_instructions_5,
+      //            vaast_test_block_1,
+      //            vaast_instructions_6,
+      //            vaast_training_block_2,
+      //            vaast_instructions_7,
+      //            vaast_test_block_2,
+      //            vaast_instructions_8, 
+      //            Quest_instructions);
+    //break;
+  //case "VAAST_first":
+    //timeline.push(vaast_instructions_1,
+      //            vaast_instructions_2,
+      //            vaast_instructions_2_1,
+      //            vaast_instructions_3, 
+      //            vaast_instructions_4,
+      //            vaast_training_block_1,
+      //            vaast_instructions_5,
+      //            vaast_test_block_1,
+      //            vaast_instructions_6,
+      //            vaast_training_block_2,
+      //            vaast_instructions_7,
+      //            vaast_test_block_2,
+      //            vaast_instructions_8,
+      //            iat_instructions_1,
+      //            iat_instructions_1_1,
+      //            iat_instructions_block_1, 
+      //            iat_block_1,
+      //            iat_instructions_block_2, 
+      //            iat_block_2,
+      //            iat_instructions_block_3, 
+      //            iat_block_3_training,
+      //            iat_instructions_block_3_test, 
+      //            iat_block_3_test,
+      //            iat_instructions_block_4, 
+      //            iat_block_4,
+      //            iat_instructions_block_5, 
+      //            iat_block_5_training,
+      //            iat_instructions_block_5_test, 
+      //            iat_block_5_test,
+      //            iat_instructions_2, 
+      //            Quest_instructions);
+    //break;
+//}
 
 timeline.push(showing_cursor);
+
+timeline.push(termo,
+              EMS);
 
 timeline.push(fullscreen_trial_exit);
 
@@ -1698,7 +1846,7 @@ if(is_compatible) {
         jsPsych.data.addProperties({
           taskOrder: TaskOrder,
         });
-        window.location.href = "https://uclpsychology.co1.qualtrics.com/jfe/form/SV_0NRoqjK0V6IpikJ?id="+jspsych_id;
+        window.location.href = "https://uclpsychology.co1.qualtrics.com/jfe/form/SV_aYw9rlyUC9X01rn?id="+jspsych_id;
     }
   });
 }
